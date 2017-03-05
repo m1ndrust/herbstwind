@@ -1,0 +1,175 @@
+########################
+CISCO COMMANDS
+#######################
+thanks to kohnlehome.de 
+
+
+Misc
+
+When in doubt, enter  ?
+
+
+User mode                       Switch>
+Enter Privilege mode            Switch>enable
+inside priv mode                Switch#
+enter configuration mode        Switch# conf t
+inside global configure mode    Switch(config)#
+enter interface mode            Switch(config)# interface fa0/1
+Select a range of interfaces    Switch(config)# int range fa0/1 - 4
+inside interface mode           Switch(config-if)# 
+exit interface mode             Switch(config-if)# exit
+exit global config mode         Switch(config)# exit
+return to user mode             Switch# disable
+Logout                          Switch> exit
+-----------------------------------------------------------
+Router specific 
+-----------------------------------------------------------
+Switch specific
+
+configure device name           Switch(config)# hostname switch69
+set encrypted enable password   Switch(config)# enable secret p4ssw0rd
+(set unencrypted enable passwd) Switch(config)# enable password p4assw0rd
+enable passwd encrypt.for all   Switch(config)# service password-encryption
+set banner motd                 Switch(config)# banner motd $
+Assign default gateway(conf)    Switch(config)# ip default-gateway 192.168.1.1
+Select an interface             Switch(config)# int fa0/1
+description of interface        Switch(config-if)# description
+Activate Port Security          Switch(config-if)# switchport mode access
+                                Switch(config-if)# switchport port-security
+                                Switch(config-if)# switchport port-security mac-address sticky
+                                (todo: Why do we need this? Explain attack and add tools ;) )
+disable interface               Switch(config-if)# shutdown
+enable interface                Switch(config-if)#no shutdown
+
+configure vty line passwd       Switch(config)#line vty 0 4
+                                Switch(config-line)#login
+                                Switch(config-line)#password s3cur3
+
+configure console password      Switch(config)#line con 0
+                                Switch(config-line)# login
+                                Switch(config-line)# password s3cur3
+Sychron. console msg            Switch(config-line)# loggin synchronous                                
+
+
+
+-----------------------------------------------------------
+ACL
+-----------------------------------------------------------
+OSPF
+Election of DR:
+Highest interface prio?
+If tie:
+    Highest Router ID
+    Configure manually, if not set highest Loopback
+    
+
+Diagnostics                     Router# show ip protocols 
+                                Router# show ip ospf neighbor
+                                Router# show ip ospf interface
+                                Router# show ip ospf
+                                Router# show ip route ospf
+                                Router# clear ip ospf PID process 
+-----------------------------------------------------------
+EtherChannel
+-----------------------------------------------------------
+Protocols: LACP or PAgP(cisco)
+combine several ports to one channel-group
+
+                               Switch(config)#interface range Fa0/4-7
+                               Switch(cofig-if-range)# channel-group 1 mode on
+                               
+Switch1 | Switch 2   | Link
+on          on          without protocol
+desirable desirable     PAgP
+desirable auto          PAgP
+actice    active        LACP
+active    passive       LACP
+
+Create virtual interfaces
+                                Switch(config)# interface Port-channel 1
+                                Switch(config-if)# switchport mode trunk
+
+Diagnostics                     Switch# show etherchannel
+                                Switch# show etherchannel summary
+                                Switch# show etherchannel port-channel
+                                Switch# show etherchannel
+-----------------------------------------------------------
+DHCP
+-----------------------------------------------------------
+Creates DHCP pool               Router(config)# ip dhcp pool POOL-NAME
+For network $network$subnet     Router(dhcp-config)# network 192.168.1.0 255.255.255.0      
+Default router                  Router(dhcp-config)# default-router 192.168.1.1
+DNS server                      Router(dhcp-config)# dns-server 192.168.1.2
+Address to exclude?(eg.printer) Router(config)# ip dhcp excluded-address 192.168.1.100  192.168.1.159
+
+
+Diagnostics                     Router# show ip dhcp binding
+
+Configure helper router         Router# ip helper-address 1.2.3.4 
+
+
+
+
+-----------------------------------------------------------
+NAT
+-----------------------------------------------------------
+configuring inside and outside interfaces
+                                Router(config)#interface f0/2                                
+                                Router(config-if)# ip nat inside
+                    
+                                Router(config)#interface S0/1   
+                                Router(config-if)# ip nat outside
+STATIC
+                                Router(config)# ip nat inside source static INSIDELOCAL INSIDEEGLOBAL
+DYNAMIC 
+                                Router(config)#access-list 1 permit INSIDELOCALIPADDRESSES WILDCARD
+                                Router(config)#ip nat pool POOLNAME STARTIPRANGE ENDIPRANGE netmask NETMASK
+                                Router(config)#ip nat inside source list 1 pool POOLNAME
+OVERLOAD(POOL)
+                                Router(config)#access-list 1 permit INSIDELOCALIPADDRESSES WILDCARD
+                                Router(config)#ip nat pool POOLNAME STARTIPRANGE ENDIPRANGE netmask NETMASK                   
+                                Router(config)#ip nat inside source list 1 pool POOLNAME overload
+OVERLOAD outside-interface
+    
+                                Router(config)#access-list 1 permit INSIDELOCALIPADDRESSES WILDCARD
+                                Router(config)#ip nat inside source list 1 interface S0/1  overload
+
+Port-forwarding
+                                Router(config)#ip nat inside source static tcp LOCALIP/PORT GLOBALIP/PORT
+
+Diagnostics                    Router# clear ip nat translations *
+                               Router# show ip nat translations
+                               Router# show ip nat statistics
+                               Router# debug ip nat
+
+-----------------------------------------------------------
+Hot Standby Router Protocol
+-----------------------------------------------------------
+Real address                            Router(config-if)#ip address 10.0.0.1 255.0.0.0
+virtual address                         Router(config-if)#standby 1 ip 10.0.0.2
+higher priority, more active            Router(config-if)#standby 1 priority 120
+
+
+
+Diagnostics                             Router# show standby
+
+
+
+-----------------------------------------------------------
+STP
+-----------------------------------------------------------
+VLAN
+-----------------------------------------------------------
+assign ip address to vlan       Switch(config)# int vlan 1
+                                Switch(config-if)# ip addr 192.168.1.11 255.255.255.0
+
+add vlan using config mode      Switch(config)# vlan 99
+                                Switch(config-vlan)# name mngmt
+Assign vlan to interface        Switch(config-if)# switchport access vlan 99
+
+-----------------------------------------------------------
+Intra-VLAN Routing
+-----------------------------------------------------------
+
+
+
