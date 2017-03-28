@@ -16,10 +16,6 @@ import sys
 # 4.Upload list of visited websites incl. notes and a visual indication when the site was last visited
 
 
-#ASK THEM ABOUT THE FULL LIST AT DETECTIFY
-#The original article states 17 services, we have now identified 100+ different ways that you can be vulnerable to a domain takeover
-
-
 #(TODO: Dir Bruteforcer)
 #TODO: Upload list in a table or something
 #TODO: send found domains to email
@@ -46,15 +42,15 @@ def get_subdomains(company):
     start = time.time()
     print "[+]trying to find some subdomains for "+company
     print "[+]be patient and read something on [website] "
-    print "[+]Started on " + time.strftime("%c") 
+    print "[+]Started on " + time.strftime("%c")
 
     with open(company+'.txt','w+') as text_file:
         for subdomain in subbrute.run(company):
             print subdomain[0]
             text_file.write(subdomain[0]+'\n')
             subdomains.append(subdomain[0])
-        text_file.close()   
-         
+        text_file.close()
+
     end = time.time()
 
     hours,rem = divmod(end-start,3600)
@@ -67,7 +63,7 @@ def get_http_status(subdomainList):
 
     #subdomains=[]
     four0subdomains =[]
-    
+
     with open(subdomainList, "r") as subwords:      #works with a textfile but not with a list!!!
         for subword in subwords:
             time.sleep(0.5)
@@ -76,7 +72,7 @@ def get_http_status(subdomainList):
                 r = requests.get(subdomain,verify=False, timeout=2)
                 if r.status_code == 404:
                     four0subdomains.append(subdomain)
-                else:   
+                else:
                     print subdomain +" status_code: \033[1;35m[{}]\033[1;m".format(r.status_code)
                     #generate overview over all subdomains with their statuscodes like so: subdomain status
                     subdomains.append(subdomain)
@@ -84,25 +80,25 @@ def get_http_status(subdomainList):
                 pass
 
 
-            
-    
+
+
 
     print "404 ->{}".format(four0subdomains)
-    return four0subdomains    
+    return four0subdomains
 
 def hostile_takeover(Four0subdomains):
 
     print "[+] Cross your fingers now!"
     for domain in Four0subdomains:
         try:
-            
+
             print domain
             print "-------DNS INFO---------------------------------------------------------------------"
             print dns.resolver.query(domain, 'CNAME').response
             print "-------DNS INFO---------------------------------------------------------------------"
         except:
             pass
-    
+
     #This is shit because we have to make an EXTRA request(We already make a request in get_subdomains(). Change it
     for domain in Four0subdomains:
         response = requests.get(domain)
@@ -119,7 +115,7 @@ def main():
 
     print "######www.convuleted-wiring.net########"
     print "\033[1;32m[!] Remember kids! Keep your wordlists up-2-date.\033[1;m"
-    
+
     if ".txt" in sys.argv[1]:
         status_list = get_http_status(sys.argv[1])
         hostile_takeover(status_list)
@@ -131,7 +127,7 @@ def main():
         exit()
 
 
-        
+
 
 if __name__ == "__main__":
         main()
